@@ -17,6 +17,7 @@ The data was obtained from the [World Bank Group](https://databank.worldbank.org
 
 ## Research Question
 **How has life expectancy across different continents change throughout the years?**
+
 It could be interesting to look at changes in average life expectancy as it reflects the health, development, and well-being of populations. Examining how it has changed across continents over time highlights global progress and disparities in healthcare, economic growth, and social policies. Gaining insights into these trends can help to promote health equity and sustainable development by highlighting areas that require attention.
 
 ```{r, include=FALSE}
@@ -38,7 +39,7 @@ data <- read_excel(here("data", "WorldLifeExp.xlsx"))
 head(data)
 ```
 
-## Data Cleaning
+## Data Cleaning and Preparation
 ```{r}
 #Removing unneccessary columns
 data <- data %>%
@@ -74,11 +75,9 @@ data <- data %>%
     `Life expectancy at birth, male (years)` = "Male",
     `Life expectancy at birth, female (years)` = "Female"
   ))
-
 ```
 
-## Data Preparation
-As there are so many countries, it would be difficult to visualise the data efficiently, hence, I used the countrycode package to sort the countries into their specific continents
+As there are so many countries, it would be difficult to visualise the data efficiently. Hence, I used the countrycode package to sort the countries into their specific continents.
 ```{r warning = FALSE}
 #Correcting the way some countries were typed so it matches data in countrycode package
 manual_corrections <- data.frame(
@@ -99,22 +98,22 @@ data <- data %>%
 data <- data %>%
   mutate(Continent = if_else(`Country Name` == "Kosovo", "Europe", Continent))
 
-# Renaming "Americas" to "North & South America" in the Continent column
+#Renaming "Americas" to "North & South America" in the continent column
 data <- data %>%
   mutate(Continent = if_else(Continent == "Americas", "North & South America", Continent))
 
-#Moving the Continent column next to the Country Name column for better readability
+#Moving the continent column next to the country name column for better readability
 data <- data %>%
   select(1, Continent, everything())
 ```
 
-I filtered out the total life expectancy rows so I can compare total life expectancy across continents
+I filtered out the total life expectancy rows so I can compare total life expectancy across continents.
 ```{r}
 total_data <- data %>%
   filter(`Population Group` == "Total")
 ```
 
-Next, I converted the data frame into a long format
+Next, I converted the data frame into a long format.
 ```{r}
 #Reshaping my data into long format 
 long_data <- total_data %>%
@@ -139,7 +138,7 @@ continent_data <- continent_data %>% filter(!is.na(Year) & Year != Inf) #Removes
 ```
 
 ## Initial visualisation
-This is the first graph that I plotted with the data above
+This is the first graph that I plotted with the data above.
 
 ```{r}
 p <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = Continent, group = Continent)) +
@@ -148,19 +147,21 @@ p <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = C
     x = "Year",
     y = "Average Life Expectancy") 
 
-print(p)
+p
 
 #Saving the graph into figs folder
 ggsave("figs/initialgraph.png", plot = p, width = 8, height = 6, dpi = 300)
 ```
-But this is a bad graph as the year and average life expectancy values are spread too far out, making it hard to visualise the graph. 
+But this is a bad graph as the year and average life expectancy values are spread too far apart, making it hard to visualise the average life expectancy per year. 
 
-## Improving on initial visualisation
+## Improving on Initial Visualisation
 Therefore, I improved my code and added these few things:
-1. Changed the font size of my graph and centralised the title and subtitle 
-2. Changed the colour of the continents according to the Olympics colour coding system for each continent
-3. Coded every year to appear on the graph for better visualisation
-4. Adjusted the y-axis range so that average life expectancy values are spaced by intervals of 5 
+
+1. Changed the font size of my graph and centralised the title and subtitle.
+2. Changed the colour of the continents according to the Olympics colour coding system.
+3. Coded every year to appear on the graph for better visualisation.
+4. Adjusted the y-axis range so that average life expectancy values are spaced by intervals of five.
+5. Adjusted the x-axis to account for every year between 1990-2022.
 
 ```{r}
 #Tidying the graph and making it look better
@@ -174,11 +175,11 @@ graph_theme <- theme(
 
 #Colour coding each continent according to the Olympics
 continent_colors <- c(
-  "Europe" = "#0066B3",   #Blue
-  "Asia" = "#FFCC00",     #Yellow
-  "Africa" = "#000000",   #Black
-  "Oceania" = "#009639",  #Green
-  "North & South America" = "#F44336"  #Red
+  "Europe" = "#0066B3", 
+  "Asia" = "#FFCC00",   
+  "Africa" = "#000000", 
+  "Oceania" = "#009639",  
+  "North & South America" = "#F44336" 
 )
 ```
 
@@ -186,7 +187,7 @@ continent_colors <- c(
 #Plotting a better graph with the changes
 p2 <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = Continent, group = Continent)) +
   geom_line() +  
-  geom_point(size = 2) +  # Points for each year for each continent
+  geom_point(size = 2) +  #Points for each year for each continent
   labs(
     title = "Life Expectancy Over Time by Continent",
     subtitle = "Year: 1990 to 2022",
@@ -200,9 +201,31 @@ p2 <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = 
   scale_color_manual(values = continent_colors) +  #Apply Olympic colours
   graph_theme
 
-print(p2)
+p2
 
 #Saving the plot
 ggsave("figs/secondgraph.png", plot = p2, width = 12, height = 6, dpi = 300)
 ```
 
+## Animating The Plot
+To make my graph more interactive and better visualised, I decided to animate it to show how average life expectancy changes across continents across the years.
+```{r animation, fig.width=12, fig.height=6, warning=FALSE, message=FALSE}
+animated_plot <- p2 +
+  labs(subtitle = "Year: {round(frame_along, 0)}") + #Round the year to remove decimals
+  transition_reveal(Year) #Animates the line to reveal over time
+
+animated_plot
+```
+
+## Summary
+In analyzing life expectancy trends across continents over time, it can be observed that life expectancy has generally increased globally, particularly in developed regions such as Europe and North & South America. However, continents such as Africa have experienced slower improvements due to various factors, including healthcare access and economic instability.
+
+It can also be seen that continents like Asia and Europe showed more consistent increases, while regions like Africa had more fluctuation. This can be attributed to factors such as epidemics (HIV/AIDS in the 1990s) or conflicts that impacted public health.
+
+The trends also reflect how public health interventions, healthcare policies, and economic development directly influence life expectancy, with nations investing in healthcare infrastructure seeing more sustained growth in life expectancy.
+
+## Future Directions
+If given more time and data, I would include more factors like GDP per capita or access to healthcare. These elements may help explain why trends in life expectancy differ between continents and may aid in predictive modelling.
+
+## References
+Boutayeb, A. (2010). The impact of infectious diseases on the development of Africa. Handbook of disease burdens and quality of life measures, 1171.
