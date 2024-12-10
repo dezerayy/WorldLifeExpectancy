@@ -88,6 +88,9 @@ data <- data %>%
 data <- data %>%
   select(1, Continent, everything())
 
+#Saving Cleaned Data
+write.csv(data, here("data", "cleaneddata.csv"), row.names = FALSE)
+
 #Isolating the total life expectancy rows so I can compare total life expectancy across continents 
 total_data <- data %>%
   filter(`Population Group` == "Total")
@@ -95,11 +98,11 @@ total_data <- data %>%
 #Reshaping my data into long format 
 long_data <- total_data %>%
   pivot_longer(
-    cols = `1990`:`2022`,  # Columns for each year
-    names_to = "Year",     # Name for the new column with years
-    values_to = "Life Expectancy"  # Name for the new column with values
+    cols = `1990`:`2022`,  #Columns for each year
+    names_to = "Year",     #Name for the new column with years
+    values_to = "Life Expectancy"  #Name for the new column with values
   ) %>%
-  mutate(Year = as.numeric(Year))  # Convert year to numeric
+  mutate(Year = as.numeric(Year))  #Convert year to numeric
 
 #Aggregate the data to calculate the total average life expectancy for each continent and year
 continent_data <- long_data %>%
@@ -109,7 +112,11 @@ continent_data <- long_data %>%
 str(continent_data$Year) #Ensuring year column is properly structured
 
 range(continent_data$Year, na.rm = TRUE)  #Check range
+
 continent_data <- continent_data %>% filter(!is.na(Year) & Year != Inf) #Removes rows with invalid or missing year values
+
+#Saving Final Cleaned Data
+write.csv(continent_data, here("data", "finalcleaneddata.csv"), row.names = FALSE)
 
 #Plotting the graph
 p <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = Continent, group = Continent)) +
@@ -121,7 +128,7 @@ p <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = C
 #Saving the graph into figs folder
 ggsave("figs/initialgraph.png", plot = p, width = 8, height = 6, dpi = 300)
 
-#Tidying the graph and making it look better
+#Setting a theme for the graph
 graph_theme <- theme(
   plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  #Main title in bold and centralised
   plot.subtitle = element_text(hjust = 0.5, size = 12, face = "italic"),  #Subtitle in italic and centralised
@@ -131,18 +138,18 @@ graph_theme <- theme(
 )
 
 #Colour coding each continent according to the Olympics
-continent_colors <- c(
-  "Europe" = "#0066B3",   #Blue
-  "Asia" = "#FFCC00",     #Yellow
-  "Africa" = "#000000",   #Black
-  "Oceania" = "#009639",  #Green
-  "North & South America" = "#F44336"  #Red
+continent_colours <- c(
+  "Europe" = "#0066B3", 
+  "Asia" = "#FFCC00",   
+  "Africa" = "#000000",
+  "Oceania" = "#009639",  
+  "North & South America" = "#F44336" 
 )
 
 #Plotting a better graph with the changes
 p2 <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = Continent, group = Continent)) +
   geom_line() +  
-  geom_point(size = 2) +  # Points for each year for each continent
+  geom_point(size = 2) +  #Points for each year for each continent
   labs(
     title = "Life Expectancy Over Time by Continent",
     subtitle = "Year: 1990 to 2022",
@@ -152,8 +159,8 @@ p2 <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = 
     breaks = seq(min(continent_data$Year), max(continent_data$Year), by = 1)) + #Show a label every year
   scale_y_continuous(
     breaks = seq(0, 100, by = 5),  #Adjust y-axis ticks for more specific ranges
-    limits = c(0, 100) ) +            #Set the y-axis range (adjust as needed)
-  scale_color_manual(values = continent_colors) +  #Apply Olympic colours
+    limits = c(0, 100) ) +            #Set the y-axis range
+  scale_color_manual(values = continent_colours) +  #Apply Olympic colours
   graph_theme
 
 #Saving the graph
@@ -162,8 +169,9 @@ ggsave("figs/secondgraph.png", plot = p2, width = 12, height = 6, dpi = 300)
 #Animating the plot
 animated_plot <- p2 +
   labs(subtitle = "Year: {round(frame_along, 0)}") + #Round the year to remove decimals
-  transition_reveal(Year) #Animates the line to reveal over time
+  transition_reveal(Year) + #Animates the line to reveal over time
 
 anim <- animate(animated_plot, width = 1200, height = 600, fps = 20, duration = 10, renderer = gifski_renderer())
 anim_save("figs/animated_plot.gif", animation = anim)
 anim
+
