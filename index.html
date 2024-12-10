@@ -357,10 +357,10 @@ display: none;
 
 <div id="project-background" class="section level2">
 <h2>Project Background</h2>
-<p>Life expectancy is a key indicator of population health and
-socio-economic development, reflecting the overall quality of life in a
-country. This analysis examines global trends in life expectancy from
-1990 to 2022, focusing on differences across continents.</p>
+<p>Life expectancy reflects the overall quality of life in a country and
+it is a key indicator of population health and socio-economic
+development. This analysis examines global trends in life expectancy
+from 1990 to 2022, focusing on differences across continents.</p>
 </div>
 <div id="data-origins" class="section level2">
 <h2>Data Origins</h2>
@@ -376,12 +376,12 @@ the years 1990 to 2023. In total, the data has 589 data entries.</p>
 <p><strong>How has life expectancy across different continents change
 throughout the years?</strong></p>
 <p>It could be interesting to look at changes in average life expectancy
-as it reflects the health, development, and well-being of populations.
-Examining how it has changed across continents over time highlights
-global progress and disparities in healthcare, economic growth, and
-social policies. Gaining insights into these trends can help to promote
-health equity and sustainable development by highlighting areas that
-require attention.</p>
+as it reflects the health and well-being of populations, as well as a
+country’s development. Examining how it has changed across continents
+over time highlights global progress and disparities in healthcare,
+economic growth, and social policies. Gaining insights into these trends
+can help to promote health equity and sustainable development by
+highlighting areas that require attention.</p>
 <pre class="r"><code>#Loading data into R
 data &lt;- read_excel(here(&quot;data&quot;, &quot;WorldLifeExp.xlsx&quot;))
 #Displaying the data
@@ -416,6 +416,7 @@ data &lt;- data %&gt;%
 #Renaming columns so it is easier to read
 data &lt;- data %&gt;%
   rename(`1990` = `1990 [YR1990]`, `1991` = `1991 [YR1991]`, `1992` = `1992 [YR1992]`, `1993` = `1993 [YR1993]`, `1994` = `1994 [YR1994]`, `1995` = `1995 [YR1995]`, `1996` = `1996 [YR1996]`, `1997` = `1997 [YR1997]`, `1998` = `1998 [YR1998]`, `1999` = `1999 [YR1999]`, `2000` = `2000 [YR2000]`, `2001` = `2001 [YR2001]`, `2002` = `2002 [YR2002]`, `2003` = `2003 [YR2003]`, `2004` = `2004 [YR2004]`, `2005` = `2005 [YR2005]`, `2006` = `2006 [YR2006]`, `2007` = `2007 [YR2007]`, `2008` = `2008 [YR2008]`, `2009` = `2009 [YR2009]`, `2010` = `2010 [YR2010]`, `2011` = `2011 [YR2011]`, `2012` = `2012 [YR2012]`, `2013` = `2013 [YR2013]`, `2014` = `2014 [YR2014]`, `2015` = `2015 [YR2015]`, `2016` = `2016 [YR2016]`, `2017` = `2017 [YR2017]`, `2018` = `2018 [YR2018]`, `2019` = `2019 [YR2019]`, `2020` = `2020 [YR2020]`, `2021` = `2021 [YR2021]`, `2022` = `2022 [YR2022]`)
+
 data &lt;- data %&gt;%
   rename(`Population Group` = `Series Name`)
 
@@ -476,13 +477,13 @@ life expectancy across continents.</p>
 <pre class="r"><code>#Reshaping my data into long format 
 long_data &lt;- total_data %&gt;%
   pivot_longer(
-    cols = `1990`:`2022`,  # Columns for each year
-    names_to = &quot;Year&quot;,     # Name for the new column with years
-    values_to = &quot;Life Expectancy&quot;  # Name for the new column with values
+    cols = `1990`:`2022`,  #Columns for each year
+    names_to = &quot;Year&quot;,     #Name for the new column with years
+    values_to = &quot;Life Expectancy&quot;  #Name for the new column with values
   ) %&gt;%
-  mutate(Year = as.numeric(Year))  # Convert year to numeric</code></pre>
+  mutate(Year = as.numeric(Year))  #Convert year to numeric</code></pre>
 <p>Finally, I calculated the average life expectancy for each continent
-and year</p>
+and year.</p>
 <pre class="r"><code>continent_data &lt;- long_data %&gt;%
   group_by(Continent, Year) %&gt;%
   summarise(Average_Life_Expectancy = mean(`Life Expectancy`, na.rm = TRUE), .groups = &quot;drop&quot;)
@@ -524,7 +525,7 @@ spaced by intervals of five.</li>
 <li>Adjusted the x-axis to account for every year between
 1990-2022.</li>
 </ol>
-<pre class="r"><code>#Tidying the graph and making it look better
+<pre class="r"><code>#Setting a theme for the graph
 graph_theme &lt;- theme(
   plot.title = element_text(hjust = 0.5, size = 14, face = &quot;bold&quot;),  #Main title in bold and centralised
   plot.subtitle = element_text(hjust = 0.5, size = 12, face = &quot;italic&quot;),  #Subtitle in italic and centralised
@@ -534,7 +535,7 @@ graph_theme &lt;- theme(
 )
 
 #Colour coding each continent according to the Olympics
-continent_colors &lt;- c(
+continent_colours &lt;- c(
   &quot;Europe&quot; = &quot;#0066B3&quot;, 
   &quot;Asia&quot; = &quot;#FFCC00&quot;,   
   &quot;Africa&quot; = &quot;#000000&quot;, 
@@ -554,8 +555,8 @@ p2 &lt;- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color
     breaks = seq(min(continent_data$Year), max(continent_data$Year), by = 1)) + #Show a label every year
   scale_y_continuous(
     breaks = seq(0, 100, by = 5),  #Adjust y-axis ticks for more specific ranges
-    limits = c(0, 100) ) +            #Set the y-axis range (adjust as needed)
-  scale_color_manual(values = continent_colors) +  #Apply Olympic colours
+    limits = c(0, 100) ) +            #Set the y-axis range
+  scale_color_manual(values = continent_colours) +  #Apply Olympic colours
   graph_theme
 
 p2</code></pre>
@@ -579,25 +580,20 @@ animated_plot</code></pre>
 <h2>Summary</h2>
 <p>In analyzing life expectancy trends across continents over time, it
 can be observed that life expectancy has generally increased globally,
-particularly in developed regions such as Europe and North &amp; South
-America. However, continents such as Africa have experienced slower
-improvements due to various factors, including healthcare access and
-economic instability.</p>
-<p>It can also be seen that continents like Asia and Europe showed more
-consistent increases, while regions like Africa had more fluctuation.
-This can be attributed to factors such as epidemics (HIV/AIDS in the
-1990s) or conflicts that impacted public health.</p>
-<p>The trends also reflect how public health interventions, healthcare
-policies, and economic development directly influence life expectancy,
-with nations investing in healthcare infrastructure seeing more
-sustained growth in life expectancy.</p>
+particularly in Europe and North &amp; South America. However, Africa
+has experienced a slower rise in life expectancy due to various factors,
+including healthcare access and economic instability.</p>
+<p>It can also be seen that Asia and Europe showed more consistent
+increases, while Africa had more fluctuation. This can be attributed to
+epidemics, such as HIV/AIDS, that plagued Africa in the 1990s.</p>
 </div>
 <div id="future-directions" class="section level2">
 <h2>Future Directions</h2>
 <p>If given more time and data, I would include more factors like GDP
-per capita or access to healthcare. These elements may help explain why
-trends in life expectancy differ between continents and may aid in
-predictive modelling.</p>
+per capita or access to healthcare. These factors may help explain why
+trends in life expectancy differ between continents and may reflect how
+public health interventions and economic development directly influence
+life expectancy. It may also aid in predictive modelling.</p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>

@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Project Background
-Life expectancy is a key indicator of population health and socio-economic development, reflecting the overall quality of life in a country. This analysis examines global trends in life expectancy from 1990 to 2022, focusing on differences across continents.
+Life expectancy reflects the overall quality of life in a country and it is a key indicator of population health and socio-economic development. This analysis examines global trends in life expectancy from 1990 to 2022, focusing on differences across continents.
 
 ## Data Origins
 The data was obtained from the [World Bank Group](https://databank.worldbank.org/source/world-development-indicators), where I manually selected the variables I was interested in. Under database, I selected life expectancy at birth, females, life expectancy at birth, males, life expectancy at birth, total. Under country, I manually selected all 196 countries, and for time, I selected the years 1990 to 2023. In total, the data has 589 data entries.
@@ -18,7 +18,7 @@ The data was obtained from the [World Bank Group](https://databank.worldbank.org
 ## Research Question
 **How has life expectancy across different continents change throughout the years?**
 
-It could be interesting to look at changes in average life expectancy as it reflects the health, development, and well-being of populations. Examining how it has changed across continents over time highlights global progress and disparities in healthcare, economic growth, and social policies. Gaining insights into these trends can help to promote health equity and sustainable development by highlighting areas that require attention.
+It could be interesting to look at changes in average life expectancy as it reflects the health and well-being of populations, as well as a country's development. Examining how it has changed across continents over time highlights global progress and disparities in healthcare, economic growth, and social policies. Gaining insights into these trends can help to promote health equity and sustainable development by highlighting areas that require attention.
 
 ```{r, include=FALSE}
 #Loading necessary packages
@@ -52,6 +52,7 @@ data <- data %>%
 #Renaming columns so it is easier to read
 data <- data %>%
   rename(`1990` = `1990 [YR1990]`, `1991` = `1991 [YR1991]`, `1992` = `1992 [YR1992]`, `1993` = `1993 [YR1993]`, `1994` = `1994 [YR1994]`, `1995` = `1995 [YR1995]`, `1996` = `1996 [YR1996]`, `1997` = `1997 [YR1997]`, `1998` = `1998 [YR1998]`, `1999` = `1999 [YR1999]`, `2000` = `2000 [YR2000]`, `2001` = `2001 [YR2001]`, `2002` = `2002 [YR2002]`, `2003` = `2003 [YR2003]`, `2004` = `2004 [YR2004]`, `2005` = `2005 [YR2005]`, `2006` = `2006 [YR2006]`, `2007` = `2007 [YR2007]`, `2008` = `2008 [YR2008]`, `2009` = `2009 [YR2009]`, `2010` = `2010 [YR2010]`, `2011` = `2011 [YR2011]`, `2012` = `2012 [YR2012]`, `2013` = `2013 [YR2013]`, `2014` = `2014 [YR2014]`, `2015` = `2015 [YR2015]`, `2016` = `2016 [YR2016]`, `2017` = `2017 [YR2017]`, `2018` = `2018 [YR2018]`, `2019` = `2019 [YR2019]`, `2020` = `2020 [YR2020]`, `2021` = `2021 [YR2021]`, `2022` = `2022 [YR2022]`)
+
 data <- data %>%
   rename(`Population Group` = `Series Name`)
 
@@ -118,14 +119,14 @@ Next, I converted the data frame into a long format.
 #Reshaping my data into long format 
 long_data <- total_data %>%
   pivot_longer(
-    cols = `1990`:`2022`,  # Columns for each year
-    names_to = "Year",     # Name for the new column with years
-    values_to = "Life Expectancy"  # Name for the new column with values
+    cols = `1990`:`2022`,  #Columns for each year
+    names_to = "Year",     #Name for the new column with years
+    values_to = "Life Expectancy"  #Name for the new column with values
   ) %>%
-  mutate(Year = as.numeric(Year))  # Convert year to numeric
+  mutate(Year = as.numeric(Year))  #Convert year to numeric
 ```
 
-Finally, I calculated the average life expectancy for each continent and year
+Finally, I calculated the average life expectancy for each continent and year.
 ```{r, echo=TRUE, results="hide"}
 continent_data <- long_data %>%
   group_by(Continent, Year) %>%
@@ -164,7 +165,7 @@ Therefore, I improved my code and added these few things:
 5. Adjusted the x-axis to account for every year between 1990-2022.
 
 ```{r}
-#Tidying the graph and making it look better
+#Setting a theme for the graph
 graph_theme <- theme(
   plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  #Main title in bold and centralised
   plot.subtitle = element_text(hjust = 0.5, size = 12, face = "italic"),  #Subtitle in italic and centralised
@@ -174,7 +175,7 @@ graph_theme <- theme(
 )
 
 #Colour coding each continent according to the Olympics
-continent_colors <- c(
+continent_colours <- c(
   "Europe" = "#0066B3", 
   "Asia" = "#FFCC00",   
   "Africa" = "#000000", 
@@ -197,8 +198,8 @@ p2 <- ggplot(continent_data, aes(x = Year, y = Average_Life_Expectancy, color = 
     breaks = seq(min(continent_data$Year), max(continent_data$Year), by = 1)) + #Show a label every year
   scale_y_continuous(
     breaks = seq(0, 100, by = 5),  #Adjust y-axis ticks for more specific ranges
-    limits = c(0, 100) ) +            #Set the y-axis range (adjust as needed)
-  scale_color_manual(values = continent_colors) +  #Apply Olympic colours
+    limits = c(0, 100) ) +            #Set the y-axis range
+  scale_color_manual(values = continent_colours) +  #Apply Olympic colours
   graph_theme
 
 p2
@@ -218,14 +219,12 @@ animated_plot
 ```
 
 ## Summary
-In analyzing life expectancy trends across continents over time, it can be observed that life expectancy has generally increased globally, particularly in developed regions such as Europe and North & South America. However, continents such as Africa have experienced slower improvements due to various factors, including healthcare access and economic instability.
+In analyzing life expectancy trends across continents over time, it can be observed that life expectancy has generally increased globally, particularly in Europe and North & South America. However, Africa has experienced a slower rise in life expectancy due to various factors, including healthcare access and economic instability.
 
-It can also be seen that continents like Asia and Europe showed more consistent increases, while regions like Africa had more fluctuation. This can be attributed to factors such as epidemics (HIV/AIDS in the 1990s) or conflicts that impacted public health.
-
-The trends also reflect how public health interventions, healthcare policies, and economic development directly influence life expectancy, with nations investing in healthcare infrastructure seeing more sustained growth in life expectancy.
+It can also be seen that Asia and Europe showed more consistent increases, while Africa had more fluctuation. This can be attributed to epidemics, such as HIV/AIDS, that plagued Africa in the 1990s.
 
 ## Future Directions
-If given more time and data, I would include more factors like GDP per capita or access to healthcare. These elements may help explain why trends in life expectancy differ between continents and may aid in predictive modelling.
+If given more time and data, I would include more factors like GDP per capita or access to healthcare. These factors may help explain why trends in life expectancy differ between continents and may reflect how public health interventions and economic development directly influence life expectancy. It may also aid in predictive modelling.
 
 ## References
 Boutayeb, A. (2010). The impact of infectious diseases on the development of Africa. Handbook of disease burdens and quality of life measures, 1171.

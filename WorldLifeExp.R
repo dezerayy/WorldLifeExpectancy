@@ -20,7 +20,7 @@ library(gganimate)
 library(gifski)
 
 #Load data into R 
-data <- read_xlsx(here("WorldLifeExp.xlsx"))
+data <- read_xlsx(here("data", "WorldLifeExp.xlsx"))
 
 #Checking the first 6 rows of my data
 head(data)
@@ -161,7 +161,6 @@ ggsave("figs/secondgraph.png", plot = p2, width = 12, height = 6, dpi = 300)
 
 #Animating the plot
 animated_plot <- p2 +
-  geom_point() +
   labs(subtitle = "Year: {round(frame_along, 0)}") + #Round the year to remove decimals
   transition_reveal(Year) #Animates the line to reveal over time
 
