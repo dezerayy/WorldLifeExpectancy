@@ -169,7 +169,7 @@ ggsave("figs/secondgraph.png", plot = p2, width = 12, height = 6, dpi = 300)
 #Animating the plot
 animated_plot <- p2 +
   labs(subtitle = "Year: {round(frame_along, 0)}") + #Round the year to remove decimals
-  transition_reveal(Year) + #Animates the line to reveal over time
+  transition_reveal(Year) #Animates the line to reveal over time
 
 anim <- animate(animated_plot, width = 1200, height = 600, fps = 20, duration = 10, renderer = gifski_renderer())
 anim_save("figs/animated_plot.gif", animation = anim)
